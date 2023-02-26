@@ -6,6 +6,21 @@
 
 # a simple script to Ipush your commits to GitHub #
 
+## ------------ COMPLEX EMOTICONS ------------ ##
+EMOTICONS=(
+    "¯\_(ツ)_/¯" "(╯°□°）╯︵ ┻━┻" "(ง'̀-'́)ง" "( ͡° ͜ʖ ͡°)" "(╯︵╰,)"
+    "(っ◕‿◕)っ" "(ಥ﹏ಥ)" "(ง •̀_•́)ง" "(づ｡◕‿‿◕｡)づ" "(╬ಠ益ಠ)"
+    "(ʘ‿ʘ)" "(╯°Д°）╯︵/(.□ . \)" "( ͡°👅 ͡°)" "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧" "(ಠ‿ಠ)"
+    "( ͡°⊖ ͡°)" "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧" "(ง'̀-'́)ง" "(ʘ‿ʘ)" "(◕ᴗ◕✿)"
+    "(✿◠‿◠)" "(╯°□°)╯︵ ʞooqǝɔɐɟ" "(ง'̀-'́)ง╭∩╮(ಠ۝ಠ)╭∩╮(ง'̀-'́)ง"
+    "┬┴┬┴┤(･_├┬┴┬┴" "( ͡❛ ͜ʖ ͡❛)" "(╯°□°)╯︵ ┻━┻ ︵ ╯(°□° ╯)" "( ͡~ ͜ʖ ͡°)"
+    "(ﾉ≧∀≦)ﾉ ‥…━━━★" "( ･_･)♡" "( ͡° ͜ʖ ͡°)╭∩╮" "( ͡• ͜ʖ ͡•)"
+    "٩(◕‿◕｡)۶" "( ͠° ͟ʖ ͡°)" "(ง'̀-'́)ง✧" "┌( ಠ‿ಠ)┘" "(≧◡≦)"
+    "(ง ื▿ ื)ว" "ಠ_ಠ" "(ง •̀_•́)งง" "ᕙ(⇀‸↼‶)ᕗ" "(ง°ل͜°)ง"
+    "(⊙_◎)" "(⊙_◎)ノ" "(ﾉﾟ0ﾟ)ﾉ~" "ᕕ( ᐛ )ᕗ" "(≧∇≦)/"
+    "(づ￣ ³￣)づ" "✌(-‿-)✌" "(ง^ᗜ^)ง" "ᕕ(⌐■_■)ᕗ ♪♬"
+)
+
 ## ------------ COLORS ------------ ##
 
 Color_Off='\033[0m' # Text Reset
@@ -37,6 +52,10 @@ while true; do
 
   echo -e "\n${BRed}[*] Your Current Branch : ${BYellow}${Branch}${Color_Off}"
 
+   # get new updates if it founded #
+  echo -e "\n${BPurple}[+] Updating Repo... \n${Color_Off}"
+  git pull 
+
   # Get the commit message from the user
     echo ""
     echo -e "${BPurple}##################################${Color_Off}"
@@ -49,10 +68,20 @@ while true; do
 
   # Check if the file exists in the current directory
   # if ls | grep -q "$filename"; then
+ 
+  # Generate two random numbers between 0 and the length of the array
+  RANDOM_INDEX_1=$((RANDOM % ${#EMOTICONS[@]}))
+  RANDOM_INDEX_2=$((RANDOM % ${#EMOTICONS[@]}))
 
-  # If the message is blank, use "Task Added" as the message
+  # Make sure the two random indexes are not equal
+  while [ $RANDOM_INDEX_2 -eq $RANDOM_INDEX_1 ]
+  do
+      RANDOM_INDEX_2=$((RANDOM % ${#EMOTICONS[@]}))
+  done
+
+  # If the message is blank, Print the two emoticons as the message
   if [ -z "$message" ]; then
-    message="Task Added"
+    message="${EMOTICONS[$RANDOM_INDEX_1]}\t${EMOTICONS[$RANDOM_INDEX_2]}"
   fi
 
   # Get the current timestamp in seconds since the epoch
@@ -65,7 +94,7 @@ while true; do
   message="$message - Timestamp: $timestamp_str"
 
   # Add all changes to the Git staging area
-  git add ./
+  git add --all ./
 
   # Add the specified file to the Git staging area
   # git add "$filename"
