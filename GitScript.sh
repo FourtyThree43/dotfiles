@@ -81,7 +81,7 @@ while true; do
 
   # If the message is blank, Print the two emoticons as the message
   if [ -z "$message" ]; then
-    message="${EMOTICONS[$RANDOM_INDEX_1]}\t${EMOTICONS[$RANDOM_INDEX_2]}"
+    message="${EMOTICONS[$RANDOM_INDEX_1]}  ${EMOTICONS[$RANDOM_INDEX_2]}"
   fi
 
   # Get the current timestamp in seconds since the epoch
