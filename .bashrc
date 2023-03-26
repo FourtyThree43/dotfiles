@@ -49,7 +49,7 @@ alias ...='cd ../..;pwd'
 alias ....='cd ../../..;pwd'
 
 
-# Press c to clear the terminal screen.
+# Press x to clear the terminal screen.
 alias x='clear'
 # Press h to view the bash history.
 alias h='history'
@@ -57,4 +57,5 @@ alias h='history'
 alias tree='tree --dirsfirst -F'
 # Make a directory and all parent directories with verbosity.
 alias mkdir='mkdir -p -v'
+# Run valgrind with all the error checks flags on.
 alias valg-full='valgrind -s --leak-check=full --show-leak-kinds=all --show-mismatched-frees=yes --track-origins=yes'
