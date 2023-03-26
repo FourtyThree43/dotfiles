@@ -1,8 +1,6 @@
-# Sample .bashrc for my SUSE Linux
-#
-# Copyright (C) 2023 FourtyThree43 (0x43)  <https://github.com/FourtyThree43>
-# LICENSE © GNU-GPL3
-#
+# Sample .bashrc for SUSE Linux
+# Copyright (c) SUSE Software Solutions Germany GmbH
+
 # There are 3 different types of shells in bash: the login shell, normal shell
 # and interactive shell. Login shells read ~/.profile and interactive shells
 # read ~/.bashrc; in our setup, /etc/profile sources ~/.bashrc - thus all
@@ -41,6 +39,7 @@ alias gst='git status'
 #scripts
 alias gsc='~/dev-environment-files/./GitScript.sh'
 alias tsi='~/dev-environment-files/./TaskInit.sh'
+alias pychk='~/dev-environment-files/./run_pycodestyle.sh'
 
 # Move to the parent folder.
 alias ..='cd ..;pwd'
@@ -58,3 +57,4 @@ alias h='history'
 alias tree='tree --dirsfirst -F'
 # Make a directory and all parent directories with verbosity.
 alias mkdir='mkdir -p -v'
+alias valg-full='valgrind -s --leak-check=full --show-leak-kinds=all --show-mismatched-frees=yes --track-origins=yes'

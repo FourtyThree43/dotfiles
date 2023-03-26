@@ -52,6 +52,7 @@ echo "# $parent_folder" > README.md
 echo "" >> README.md
 echo "$current_folder" >> README.md
 echo "" >> README.md
+echo "" >> README.md
 figlet -c "FourtyThree43" >> README.md
 figlet -c "1x43" >> README.md
 echo "" >> README.md
