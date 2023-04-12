@@ -35,11 +35,18 @@ alias gp='git push origin'
 alias gch='git checkout'
 alias gst='git status'
 
+# ls
+alias ls='lsd'
+alias l='ls -l'
+alias la='ls -a'
+alias lla='ls -la'
+alias lt='ls --tree'
 
 #scripts
 alias gsc='~/dev-environment-files/./GitScript.sh'
 alias tsi='~/dev-environment-files/./TaskInit.sh'
 alias pychk='~/dev-environment-files/./run_pycodestyle.sh'
+alias pychk-all='~/dev-environment-files/./run_pycodestyle_all.sh'
 
 # Move to the parent folder.
 alias ..='cd ..;pwd'
@@ -59,3 +66,6 @@ alias tree='tree --dirsfirst -F'
 alias mkdir='mkdir -p -v'
 # Run valgrind with all the error checks flags on.
 alias valg-full='valgrind -s --leak-check=full --show-leak-kinds=all --show-mismatched-frees=yes --track-origins=yes'
+
+# helix
+alias hx='helix'
