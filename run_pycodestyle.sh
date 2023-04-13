@@ -46,5 +46,15 @@ else
   printf "${BGreen}Check Done!${Color_off} ${BPurple}Errors found:${Color_off} ${White}${EMOTICONS[$RANDOM_INDEX]}${Color_off}\n"
   #printf "${White}$check_output${Color_off}\n"
   #echo "$check_output" | perl -F: -lane 'if ($F[0] =~ /^\.\//) {printf "\033[0;33m%s\033[0m:%s:%s\033[1;31m:%s:\033[0m \033[1;36m%s\033[0m\n", $F[0], $F[1], $F[2], $F[3], $F[4]} else {print}'
-  echo "$check_output" | awk -F':' '{if (index($1, "./") == 1) printf "\033[0;33m%s\033[0m:%s:%s\033[1;31m:%s:\033[0m \033[1;36m%s\033[0m\n", $1, $2, $3, $4, $5; else print}'
+  echo "$check_output" | awk -F':' '{if (index($1, "./") == 1) printf "\033[0;33m%s\033[0m:%s:%s:\033[1;31m%s:\033[0m \033[1;36m%s\033[0m\n", $1, $2, $3, $4, $5; else print}'
 fi
+
+
+# awk -F':' $1, $2, $3, $4, and $5
+# ./dir1/file.py:123:4: E123 error message, then:
+# $1->filename would be ./dir1/file.py
+# $2->line_num would be 123
+# $3->col_num would be 4
+# $4->error_code would be E123
+# $5->error_msg would be error message
+#
