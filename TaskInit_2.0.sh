@@ -33,8 +33,8 @@ On_Blue='\033[44m'  On_Purple='\033[45m' On_Cyan='\033[46m'  On_White='\033[47m'
 # Check if folder name arguments are provided
 if [ $# -eq 0 ]; then
     echo -e "${BYellow}Usage:"
-    echo -e "\t${BPurple}$0 ${BBlue}folder_name"
-    echo -e "\t${BPurple}$0 ${BBlue}folder_name1 folder_name2 folder_name3 .. ${Color_Off}"
+    echo -e "\t${BPurple}./script.sh ${BBlue}folder_name"
+    echo -e "\t${BPurple}./script.sh ${BBlue}folder_name1 folder_name2 folder_name3 .. ${Color_Off}"
     exit 1
 fi
 
@@ -45,7 +45,7 @@ echo -e "+-------------+-----------------+${Color_Off}"
 
 # Initialize the progress bar
 echo -ne "${BCyan}Progress:${Color_Off}\n"
-bar_length=30
+bar_length=20
 progress=0
 
 # Loop over folder name arguments
