@@ -46,7 +46,12 @@ else
   printf "${BGreen}Check Done!${Color_off} ${BPurple}Errors found:${Color_off} ${White}${EMOTICONS[$RANDOM_INDEX]}${Color_off}\n"
   #printf "${White}$check_output${Color_off}\n"
   #echo "$check_output" | perl -F: -lane 'if ($F[0] =~ /^\.\//) {printf "\033[0;33m%s\033[0m:%s:%s\033[1;31m:%s:\033[0m \033[1;36m%s\033[0m\n", $F[0], $F[1], $F[2], $F[3], $F[4]} else {print}'
-  echo "$check_output" | awk -F':' '{if (index($1, "./") == 1) printf "\033[0;33m%s\033[0m:%s:%s:\033[1;31m%s:\033[0m \033[1;36m%s\033[0m\n", $1, $2, $3, $4, $5; else print}'
+  echo "$check_output" | awk -F':' '{
+        if (index($1, "./") == 1)
+          printf "\033[1;33m%s\033[0m:\033[1;41m%s:\033[1;42m%s\033[0;m:\033[1;36m%s:\033[0m \033[1;36m%s\033[0m\n", $1, $2, $3, $4, $5;
+        else
+          print "\033[1m"$1"\033[0m";
+    }'
 fi
 
 
