@@ -58,10 +58,10 @@ while true; do
 
   # Get the commit message from the user
     echo ""
-    echo -e "${BPurple}##################################${Color_Off}"
-    echo -e "${BGreen}# Write your commit comment! :-  #${Color_Off}"
+    echo -e "${BPurple}#####################################${Color_Off}"
+    echo -e "${BGreen}# -: Write your commit comment! :-  #${Color_Off}"
     read message
-
+    echo -e "${BPurple}#####################################${Color_Off}"
 	# Prompt the user for the name of the file to add
   # echo "Enter the name of the file to add:"
   # read filename

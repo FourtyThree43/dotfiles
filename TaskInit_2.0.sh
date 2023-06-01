@@ -29,6 +29,9 @@ UBlue='\033[4;34m'  UPurple='\033[4;35m' UCyan='\033[4;36m'  UWhite='\033[4;37m'
 On_Black='\033[40m' On_Red='\033[41m'    On_Green='\033[42m' On_Yellow='\033[43m'
 On_Blue='\033[44m'  On_Purple='\033[45m' On_Cyan='\033[46m'  On_White='\033[47m'
 
+## ------------ AUTHOR ALIASES ------------ ##
+author_code='FT43'
+author_hex='1x43'
 
 # Check if folder name arguments are provided
 if [ $# -eq 0 ]; then
@@ -78,10 +81,10 @@ for folder_name in "$@"; do
             # Get repository author name
             author_name=$(git -C "$parent_dir" log --format='%aN' | head -n 1)
             if [ -n "$author_name" ]; then
-                { echo -e "# $parent_repo_name\n";echo -e "$folder_name\n"; figlet -c -f smkeyboard "$author_name"; figlet -c -f Doh "1x43"; } >> README.md
+                { echo -e "# $parent_repo_name\n";echo -e "## $folder_name\n"; figlet -c -f smkeyboard "$author_name"; figlet -c -f Doh "$author_hex"; } >> README.md
                 echo -e "${BYellow}README.md ${BGreen}=> creation [✔] D O N E !${Color_Off}"
             else
-                { echo -e "# $parent_repo_name\n";echo -e "$folder_name\n"; figlet -c -f Epic "1x43"; figlet -c -f Doh "FT43"; } >> README.md
+                { echo -e "# $parent_repo_name\n";echo -e "## $folder_name\n"; figlet -c -f Epic "$author_hex"; figlet -c -f Doh "$author_code"; } >> README.md
                 echo -e "${BYellow}README.md ${BGreen}=> creation [✔] D O N E !${Color_Off}"
             fi
         else
@@ -89,7 +92,7 @@ for folder_name in "$@"; do
             parent_dir_name=$(basename "$(dirname "$PWD")")
             echo -e "Parent directory:${UPurple} $parent_dir_name ${Color_Off}"
 
-            { echo -e "# $parent_folder_name\n"; echo -e "$folder_name\n"; figlet -c -f Doh "FT43"; figlet -c -f larry3d "1x43"; } >> README.md
+            { echo -e "# $parent_dir_name\n"; echo -e "## $folder_name\n"; figlet -c -f Doh "$author_code"; figlet -c -f larry3d "$author_hex"; } >> README.md
     		echo -e "${BYellow}README.md ${BGreen}=> creation [✔] D O N E !${Color_Off}"
         fi
     fi
