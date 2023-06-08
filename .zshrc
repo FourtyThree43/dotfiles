@@ -1,16 +1,4 @@
-# Sample .bashrc for SUSE Linux
-# Copyright (c) SUSE Software Solutions Germany GmbH
-
-# There are 3 different types of shells in bash: the login shell, normal shell
-# and interactive shell. Login shells read ~/.profile and interactive shells
-# read ~/.bashrc; in our setup, /etc/profile sources ~/.bashrc - thus all
-# settings made here will also take effect in a login shell.
-#
-# NOTE: It is recommended to make language settings in ~/.profile rather than
-# here, since multilingual X sessions would not work properly if LANG is over-
-# ridden in every subshell.
-
-test -s ~/.alias && . ~/.alias || true
+# My zsh config. Not much to see here; just some pretty standard stuff.
 
 # =============================================================================
 #
@@ -19,13 +7,13 @@ test -s ~/.alias && . ~/.alias || true
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd() {
-	\builtin pwd -L
+    \builtin pwd -L
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd() {
-	# shellcheck disable=SC2164
-	\builtin cd -- "$@"
+    # shellcheck disable=SC2164
+    \builtin cd -- "$@"
 }
 
 # =============================================================================
@@ -34,22 +22,15 @@ function __zoxide_cd() {
 #
 
 # Hook to add new entries to the database.
-__zoxide_oldpwd="$(__zoxide_pwd)"
-
 function __zoxide_hook() {
-	\builtin local -r retval="$?"
-	\builtin local pwd_tmp
-	pwd_tmp="$(__zoxide_pwd)"
-	if [[ ${__zoxide_oldpwd} != "${pwd_tmp}" ]]; then
-		__zoxide_oldpwd="${pwd_tmp}"
-		\command zoxide add -- "${__zoxide_oldpwd}"
-	fi
-	return "${retval}"
+    # shellcheck disable=SC2312
+    \command zoxide add -- "$(__zoxide_pwd)"
 }
 
 # Initialize hook.
-if [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]]; then
-	PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND#;}"
+# shellcheck disable=SC2154
+if [[ ${precmd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]] && [[ ${chpwd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]]; then
+    chpwd_functions+=(__zoxide_hook)
 fi
 
 # =============================================================================
@@ -61,29 +42,27 @@ __zoxide_z_prefix='z#'
 
 # Jump to a directory using only keywords.
 function __zoxide_z() {
-	# shellcheck disable=SC2199
-	if [[ $# -eq 0 ]]; then
-		__zoxide_cd ~
-	elif [[ $# -eq 1 && $1 == '-' ]]; then
-		__zoxide_cd "${OLDPWD}"
-	elif [[ $# -eq 1 && -d $1 ]]; then
-		__zoxide_cd "$1"
-	elif [[ ${@: -1} == "${__zoxide_z_prefix}"* ]]; then
-		# shellcheck disable=SC2124
-		\builtin local result="${@: -1}"
-		__zoxide_cd "${result:${#__zoxide_z_prefix}}"
-	else
-		\builtin local result
-		# shellcheck disable=SC2312
-		result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" &&
-			__zoxide_cd "${result}"
-	fi
+    # shellcheck disable=SC2199
+    if [[ "$#" -eq 0 ]]; then
+        __zoxide_cd ~
+    elif [[ "$#" -eq 1 ]] && { [[ -d "$1" ]] || [[ "$1" = '-' ]] || [[ "$1" =~ ^[-+][0-9]$ ]]; }; then
+        __zoxide_cd "$1"
+    elif [[ "$@[-1]" == "${__zoxide_z_prefix}"* ]]; then
+        # shellcheck disable=SC2124
+        \builtin local result="${@[-1]}"
+        __zoxide_cd "${result:${#__zoxide_z_prefix}}"
+    else
+        \builtin local result
+        # shellcheck disable=SC2312
+        result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" &&
+            __zoxide_cd "${result}"
+    fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
-	\builtin local result
-	result="$(\command zoxide query -i -- "$@")" && __zoxide_cd "${result}"
+    \builtin local result
+    result="$(\command zoxide query -i -- "$@")" && __zoxide_cd "${result}"
 }
 
 # =============================================================================
@@ -93,58 +72,53 @@ function __zoxide_zi() {
 
 \builtin unalias z &>/dev/null || \builtin true
 function z() {
-	__zoxide_z "$@"
+    __zoxide_z "$@"
 }
 
 \builtin unalias zi &>/dev/null || \builtin true
 function zi() {
-	__zoxide_zi "$@"
+    __zoxide_zi "$@"
 }
 
-# Load completions.
-# - Bash 4.4+ is required to use `@Q`.
-# - Completions require line editing. Since Bash supports only two modes of
-#   line editing (`vim` and `emacs`), we check if either them is enabled.
-# - Completions don't work on `dumb` terminals.
-if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VERSINFO[0]:-0} -ge 5 ]] &&
-	[[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
-	# Use `printf '\e[5n'` to redraw line after fzf closes.
-	\builtin bind '"\e[0n": redraw-current-line' &>/dev/null
+if [[ -o zle ]]; then
+    function __zoxide_z_complete() {
+        # Only show completions when the cursor is at the end of the line.
+        # shellcheck disable=SC2154
+        [[ "${#words[@]}" -eq "${CURRENT}" ]] || return 0
 
-	function __zoxide_z_complete() {
-		# Only show completions when the cursor is at the end of the line.
-		[[ ${#COMP_WORDS[@]} -eq $((COMP_CWORD + 1)) ]] || return
+        if [[ "${#words[@]}" -eq 2 ]]; then
+            _files -/
+        elif [[ "${words[-1]}" == '' ]]; then
+            \builtin local result
+            # shellcheck disable=SC2086,SC2312
+            if result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- ${words[2,-1]})"; then
+                result="${__zoxide_z_prefix}${result}"
+                # shellcheck disable=SC2296
+                compadd -Q "${(q-)result}"
+            fi
+            \builtin printf '\e[5n'
+        fi
+        return 0
+    }
 
-		# If there is only one argument, use `cd` completions.
-		if [[ ${#COMP_WORDS[@]} -eq 2 ]]; then
-			\builtin mapfile -t COMPREPLY < <(
-				\builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
-			)
-		# If there is a space after the last word, use interactive selection.
-		elif [[ -z ${COMP_WORDS[-1]} ]]; then
-			\builtin local result
-			# shellcheck disable=SC2312
-			result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}")" &&
-				COMPREPLY=("${__zoxide_z_prefix}${result}/")
-			\builtin printf '\e[5n'
-		fi
-	}
-
-	\builtin complete -F __zoxide_z_complete -o filenames -- z
-	\builtin complete -r zi &>/dev/null || \builtin true
+    \builtin bindkey '\e[0n' 'reset-prompt'
+    if [[ "${+functions[compdef]}" -ne 0 ]]; then
+        \compdef -d z
+        \compdef -d zi
+        \compdef __zoxide_z_complete z
+    fi
 fi
 
 # =============================================================================
 #
-# To initialize zoxide, add this to your configuration (usually ~/.bashrc):
+# To initialize zoxide, add this to your configuration (usually ~/.zshrc):
 #
-eval "$(zoxide init bash)"
-
 
 ### EXPORT
 export TERM="xterm-256color"                      # getting proper colors
-export HISTCONTROL=ignoredups:erasedups           # no duplicate entries
-export ALTERNATE_EDITOR=""                        # setting for emacsclient
+export HISTORY_IGNORE="(ls|cd|pwd|exit|sudo reboot|history|cd -|cd ..)"
+#export EDITOR="emacsclient -t -a ''"              # $EDITOR use Emacs in terminal
+#export VISUAL="emacsclient -c -a emacs"           # $VISUAL use Emacs in GUI mode
 
 ### SET MANPAGER
 ### Uncomment only one of these!
@@ -161,16 +135,10 @@ alias man='batman'
 
 ### SET VI MODE ###
 # Comment this line out to enable default emacs-like bindings
-set -o vi
-bind -m vi-command 'Control-l: clear-screen'
-bind -m vi-insert 'Control-l: clear-screen'
+bindkey -v
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
-
-### PROMPT
-# This is commented out if using starship prompt
-# PS1='[\u@\h \W]\$ '
 
 ### PATH
 if [ -d "$HOME/.bin" ] ;
@@ -195,69 +163,70 @@ case ${TERM} in
     ;;
 esac
 
-### SHOPT
-shopt -s autocd # change to named directory
-shopt -s cdspell # autocorrects cd misspellings
-shopt -s cmdhist # save multi-line commands in history as single line
-shopt -s dotglob
-shopt -s histappend # do not overwrite history
-shopt -s expand_aliases # expand aliases
-shopt -s checkwinsize # checks term size when bash regains control
+### Function extract for common file formats ###
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
 
-#ignore upper and lowercase when TAB completion
-bind "set completion-ignore-case on"
-
-### COUNTDOWN
-
-cdown () {
-    N=$1
-  while [[ $((--N)) >  0 ]]
+function extract {
+ if [ -z "$1" ]; then
+    # display usage if no parameters given
+    echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz>"
+    echo "       extract <path/file_name_1.ext> [path/file_name_2.ext] [path/file_name_3.ext]"
+ else
+    for n in "$@"
     do
-        echo "$N" |  figlet -c | lolcat &&  sleep 1
+      if [ -f "$n" ] ; then
+          case "${n%,}" in
+            *.cbt|*.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar)
+                         tar xvf "$n"       ;;
+            *.lzma)      unlzma ./"$n"      ;;
+            *.bz2)       bunzip2 ./"$n"     ;;
+            *.cbr|*.rar)       unrar x -ad ./"$n" ;;
+            *.gz)        gunzip ./"$n"      ;;
+            *.cbz|*.epub|*.zip)       unzip ./"$n"       ;;
+            *.z)         uncompress ./"$n"  ;;
+            *.7z|*.arj|*.cab|*.cb7|*.chm|*.deb|*.dmg|*.iso|*.lzh|*.msi|*.pkg|*.rpm|*.udf|*.wim|*.xar)
+                         7z x ./"$n"        ;;
+            *.xz)        unxz ./"$n"        ;;
+            *.exe)       cabextract ./"$n"  ;;
+            *.cpio)      cpio -id < ./"$n"  ;;
+            *.cba|*.ace)      unace x ./"$n"      ;;
+            *)
+                         echo "extract: '$n' - unknown archive method"
+                         return 1
+                         ;;
+          esac
+      else
+          echo "'$n' - file does not exist"
+          return 1
+      fi
     done
+fi
 }
 
-### ARCHIVE EXTRACTION
-# usage: ex <file>
-ex ()
-{
-  if [ -f "$1" ] ; then
-    case $1 in
-      *.tar.bz2)   tar xjf $1   ;;
-      *.tar.gz)    tar xzf $1   ;;
-      *.bz2)       bunzip2 $1   ;;
-      *.rar)       unrar x $1   ;;
-      *.gz)        gunzip $1    ;;
-      *.tar)       tar xf $1    ;;
-      *.tbz2)      tar xjf $1   ;;
-      *.tgz)       tar xzf $1   ;;
-      *.zip)       unzip $1     ;;
-      *.Z)         uncompress $1;;
-      *.7z)        7z x $1      ;;
-      *.deb)       ar x $1      ;;
-      *.tar.xz)    tar xf $1    ;;
-      *.tar.zst)   unzstd $1    ;;
-      *)           echo "'$1' cannot be extracted via ex()" ;;
-    esac
-  else
-    echo "'$1' is not a valid file"
-  fi
-}
-
-# add date and time formatting to bash history.
-HISTTIMEFORMAT="%F %T "
-
-# ignore duplicate commands in the history.
-HISTCONTROL=ignoredups
-
-# set the number of lines in active history
-HISTSIZE=2000
-HISTFILESIZE=2000
+IFS=$SAVEIFS
 
 ### ALIASES ###
-# \x1b[2J   <- clears tty
-# \x1b[1;1H <- goes to (1, 1) (start)
-#alias clear='echo -en "\x1b[2J\x1b[1;1H" ; echo; echo; seq 1 (tput cols) | sort -R | spark | lolcat; echo; echo'
+
+# navigation
+up () {
+  local d=""
+  local limit="$1"
+
+  # Default to limit of 1
+  if [ -z "$limit" ] || [ "$limit" -le 0 ]; then
+    limit=1
+  fi
+
+  for ((i=1;i<=limit;i++)); do
+    d="../$d"
+  done
+
+  # perform cd. Show error if cd fails
+  if ! cd "$d"; then
+    echo "Couldn't go up $limit dirs.";
+  fi
+}
 alias x='clear'
 alias h='history' # Press h to view the bash history.
 
@@ -325,7 +294,6 @@ alias psmem='ps auxf | sort -nr -k 4'
 alias pscpu='ps auxf | sort -nr -k 3'
 
 # git
-alias gst='git status'
 alias addup='git add -u'
 alias addall='git add .'
 alias branch='git branch'
@@ -337,6 +305,7 @@ alias pull='git pull origin'
 alias push='git push origin'
 alias tag='git tag'
 alias newtag='git tag -a'
+alias gst='git status'
 
 # get error messages from journalctl
 alias jctl="journalctl -p 3 -xb"
@@ -379,6 +348,14 @@ alias tofish="sudo chsh $USER -s /bin/fish && echo 'Now log out.'"
 # e Arch User Repository: shell-color-scripts
 colorscript random
 
-# PROMPT
-eval "$(oh-my-posh init bash)"
-eval "$(oh-my-posh init bash --config ~/.poshthemes/emodipt-extend.omp.json)"
+### BASH INSULTER (works in zsh though) ###
+if [ -f /etc/bash.command-not-found ]; then
+    . /etc/bash.command-not-found
+fi
+
+### SETTING THE STARSHIP PROMPT ###
+#eval "$(starship init zsh)"
+
+### SETTING THE OH MY POSH PROMPT ###
+eval "$(oh-my-posh init zsh)"
+eval "$(oh-my-posh init zsh --config ~/.poshthemes/emodipt-extend.omp.json)"

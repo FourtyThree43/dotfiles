@@ -52,22 +52,23 @@ while true; do
 
   echo -e "\n${BRed}[*] Your Current Branch : ${BYellow}${Branch}${Color_Off}"
 
-   # get new updates if it founded #
+  # get new updates if it founded #
   echo -e "\n${BPurple}[+] Updating Repo... \n${Color_Off}"
   git pull
 
-  # Get the commit message from the user
-    echo ""
-    echo -e "${BPurple}#####################################${Color_Off}"
-    echo -e "${BGreen}# -: Write your commit comment! :-  #${Color_Off}"
-    read message
-    echo -e "${BPurple}#####################################${Color_Off}"
-	# Prompt the user for the name of the file to add
+  # Prompt the user for the name of the file to add
   # echo "Enter the name of the file to add:"
   # read filename
 
   # Check if the file exists in the current directory
   # if ls | grep -q "$filename"; then
+  # Get the commit message from the user
+
+  echo ""
+  echo -e "${BPurple}#####################################${Color_Off}"
+  echo -e "${BGreen}# -: Write your commit comment! :-  #${Color_Off}"
+  read message
+  echo -e "${BPurple}#####################################${Color_Off}"
 
   # Generate two random numbers between 0 and the length of the array
   RANDOM_INDEX_1=$((RANDOM % ${#EMOTICONS[@]}))
