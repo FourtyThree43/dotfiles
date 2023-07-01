@@ -81,10 +81,10 @@ for folder_name in "$@"; do
             # Get repository author name
             author_name=$(git -C "$parent_dir" log --format='%aN' | head -n 1)
             if [ -n "$author_name" ]; then
-                { echo -e "# $parent_repo_name\n";echo -e "## $folder_name\n"; figlet -c -f smkeyboard "$author_name"; figlet -c -f Doh "$author_hex"; } >> README.md
+                { echo -e "# $parent_repo_name\n";echo -e "## $folder_name\n"; figlet -c -f digital  "$author_name"; figlet -c -f block "$author_hex"; echo -e "## ❝ Quote ❞\n"; fortune; } >> README.md
                 echo -e "${BYellow}README.md ${BGreen}=> creation [✔] D O N E !${Color_Off}"
             else
-                { echo -e "# $parent_repo_name\n";echo -e "## $folder_name\n"; figlet -c -f Epic "$author_hex"; figlet -c -f Doh "$author_code"; } >> README.md
+                { echo -e "# $parent_repo_name\n";echo -e "## $folder_name\n"; figlet -c -f slant "$author_hex"; figlet -c -f block "$author_code"; echo -e "## ❝ Quote ❞\n"; fortune; } >> README.md
                 echo -e "${BYellow}README.md ${BGreen}=> creation [✔] D O N E !${Color_Off}"
             fi
         else
@@ -92,7 +92,7 @@ for folder_name in "$@"; do
             parent_dir_name=$(basename "$(dirname "$PWD")")
             echo -e "Parent directory:${UPurple} $parent_dir_name ${Color_Off}"
 
-            { echo -e "# $parent_dir_name\n"; echo -e "## $folder_name\n"; figlet -c -f Doh "$author_code"; figlet -c -f larry3d "$author_hex"; } >> README.md
+            { echo -e "# $parent_dir_name\n"; echo -e "## $folder_name\n"; figlet -c "$author_code"; figlet -c -f block "$author_hex"; echo -e "## ❝ Quote ❞\n"; fortune; } >> README.md
     		echo -e "${BYellow}README.md ${BGreen}=> creation [✔] D O N E !${Color_Off}"
         fi
     fi
